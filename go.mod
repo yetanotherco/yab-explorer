@@ -3,8 +3,11 @@ module yab-explorer
 go 1.22.0
 
 require (
+	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/gin-gonic/gin v1.9.1
+	github.com/google/wire v0.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/sirupsen/logrus v1.9.3
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.8
 )
