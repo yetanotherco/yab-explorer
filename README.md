@@ -20,7 +20,7 @@ The following environment variables are required to run the code:
 
 ```dotenv
 API_PORT=<api_port>
-LOGGING_LEVEL=<DEBUG|TRACE>
+LOGGING_LEVEL=<DEBUG|TRACE|INFO>
 POSTGRES_HOST=<postgres_host>
 POSTGRES_USER=<postgres_user>
 POSTGRES_PASSWORD=<postgres_password>
