@@ -32,13 +32,13 @@ The following table describes each environment variable:
 
 | Variable          | Description                                                                                                                                              |
 |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| API_PORT          | Specifies the port on which the API server listens for incoming requests.                                                                                |
-| LOGGING_LEVEL     | Determines the level of detail in the logs produced by the application. Allowed values are DEBUG or TRACE.                                               |
+| API_PORT          | Specifies the port on which the API server listens for incoming requests. If not provided, the default value is 8080.                                                                               |
+| LOGGING_LEVEL     | Determines the level of detail in the logs produced by the application. Allowed values are DEBUG, TRACE or INFO. If not provided, the default value is INFO.                                               |
 | POSTGRES_HOST     | The hostname or IP address of the PostgreSQL database.                                                                                                   |
 | POSTGRES_USER     | The username used to authenticate with the PostgreSQL database.                                                                                          |
 | POSTGRES_PASSWORD | The password associated with the POSTGRES_USER for authenticating with the PostgreSQL database.                                                          |
 | POSTGRES_DATABASE | The name of the PostgreSQL database.                                                                                                                     |
-| POSTGRES_PORT     | The port on which the PostgreSQL server is listening for connections. This is typically 5432 for PostgreSQL databases but can be configured differently. |
+| POSTGRES_PORT     | The port on which the PostgreSQL server is listening for connections. If not provided, the default value is 5432. |
 
 Run the following command to create a `.env` file based on `.env.example` with the required environment variables:
 

@@ -16,6 +16,11 @@ func init() {
 func main() {
 
 	apiPort := os.Getenv("API_PORT")
+
+	if apiPort == "" {
+		apiPort = "8080"
+	}
+
 	init := configs.Init()
 	app := router.Init(init)
 

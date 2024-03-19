@@ -19,6 +19,6 @@ build:
 	go build -o yab-explorer ./cmd
 
 run:
-	@echo "🧑‍💻 Starting API server on port $(API_PORT)..."
+	@echo "🧑‍💻 Starting API server..."
 	make build 
 	./yab-explorer
