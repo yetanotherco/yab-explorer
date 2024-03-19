@@ -2,7 +2,8 @@ package configs
 
 import (
 	"fmt"
-	"yab-explorer/models"
+	"log"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,23 +11,23 @@ import (
 
 var dbInstance *gorm.DB
 
-func NewDBConnection(host, user, password, dbName, port string) *gorm.DB {
+func ConnectToDB() *gorm.DB {
 	if dbInstance != nil {
 		return dbInstance
 	}
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbName, port)
+	host := os.Getenv("POSTGRES_HOST")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	name := os.Getenv("POSTGRES_DATABASE")
+	port := os.Getenv("POSTGRES_PORT")
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, name, port)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		panic("Failed to connect database")
-	}
-
-	err = db.AutoMigrate(&models.Order{})
-
-	if err != nil {
-		panic("Failed to migrate database")
+		log.Fatal("Error connecting to database. Error: ", err)
 	}
 
 	dbInstance = db

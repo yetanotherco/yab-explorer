@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"yab-explorer/services"
@@ -10,68 +9,67 @@ import (
 )
 
 type OrderController interface {
-	GetOrder(ctx *gin.Context)
-	GetOrders(ctx *gin.Context)
+	GetOrder(c *gin.Context)
+	GetOrders(c *gin.Context)
 }
 
-type controller struct {
+type OrderControllerImpl struct {
 	service services.OrderService
 }
 
-func New(service services.OrderService) OrderController {
-	return &controller{service: service}
+func OrderControllerInit(orderService services.OrderService) *OrderControllerImpl {
+	return &OrderControllerImpl{service: orderService}
 }
 
-func (c *controller) GetOrder(ctx *gin.Context) {
-	orderIDStr := ctx.Param("orderID")
+func (o OrderControllerImpl) GetOrder(c *gin.Context) {
+	orderIDStr := c.Param("orderID")
 
 	orderID, err := strconv.Atoi(orderIDStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
 		return
 	}
 
-	order, err := c.service.GetOrder(orderID)
+	order, err := o.service.GetOrder(orderID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Order not found"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Order not found"})
 		return
 	}
-	ctx.JSON(http.StatusOK, order)
+	c.JSON(http.StatusOK, order)
 }
 
-func (c *controller) GetOrders(ctx *gin.Context) {
-	fmt.Println("GetOrders")
-	pageStr := ctx.DefaultQuery("page", "1")
-	limitStr := ctx.DefaultQuery("limit", "10")
+func (o OrderControllerImpl) GetOrders(c *gin.Context) {
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
 		return
 	}
 
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit number"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit number"})
 		return
 	}
 
 	if page < 1 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Page must be greater than 0"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Page must be greater than 0"})
 		return
 	}
 
 	if limit < 1 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Limit must be greater than 0"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Limit must be greater than 0"})
 		return
 	}
 
-	orders, err := c.service.GetOrders(page, limit)
+	orders, err := o.service.GetOrders(page, limit)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, orders)
+	c.JSON(http.StatusOK, orders)
 
 }
