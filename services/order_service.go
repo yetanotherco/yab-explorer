@@ -9,7 +9,8 @@ import (
 
 type OrderService interface {
 	GetOrder(orderID int) (models.Order, error)
-	GetOrders(page, limit int) ([]models.Order, error)
+	GetOrders(page, pageSize int) ([]models.Order, error)
+	GetTotalOrders() (int, error)
 }
 
 type OrderServiceImpl struct {
@@ -30,12 +31,22 @@ func (o OrderServiceImpl) GetOrder(orderID int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderServiceImpl) GetOrders(page, limit int) ([]models.Order, error) {
-	log.Info("Called GetOrders with page: ", page, " and limit: ", limit, " in OrderServiceImpl.")
-	orders, err := o.orderRepository.GetOrders(page, limit)
+func (o OrderServiceImpl) GetOrders(page, pageSize int) ([]models.Order, error) {
+	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " in OrderServiceImpl.")
+	orders, err := o.orderRepository.GetOrders(page, pageSize)
 	if err != nil {
-		log.Error("Error getting orders with page: ", page, " and limit: ", limit, " in OrderServiceImpl. Error: ", err)
+		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " in OrderServiceImpl. Error: ", err)
 		return []models.Order{}, err
 	}
 	return orders, nil
+}
+
+func (o OrderServiceImpl) GetTotalOrders() (int, error) {
+	log.Info("Called GetTotalOrders in OrderServiceImpl.")
+	totalOrders, err := o.orderRepository.GetTotalOrders()
+	if err != nil {
+		log.Error("Error getting total orders in OrderServiceImpl. Error: ", err)
+		return 0, err
+	}
+	return totalOrders, nil
 }

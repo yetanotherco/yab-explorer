@@ -10,7 +10,8 @@ import (
 
 type OrderRepository interface {
 	GetOrder(id int) (models.Order, error)
-	GetOrders(page, limit int) ([]models.Order, error)
+	GetOrders(page, pageSize int) ([]models.Order, error)
+	GetTotalOrders() (int, error)
 }
 
 type OrderRepositoryImpl struct {
@@ -32,12 +33,22 @@ func (o OrderRepositoryImpl) GetOrder(id int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderRepositoryImpl) GetOrders(page, limit int) ([]models.Order, error) {
+func (o OrderRepositoryImpl) GetOrders(page, pageSize int) ([]models.Order, error) {
 	var orders []models.Order
-	err := o.db.Limit(limit).Offset((page - 1) * limit).Order("created_at desc").Find(&orders).Error
+	err := o.db.Limit(pageSize).Offset((page - 1) * pageSize).Order("created_at desc").Find(&orders).Error
 	if err != nil {
-		log.Error("Error getting orders with page: ", page, " and limit: ", limit, " in OrderRepositoryImpl. Error: ", err)
+		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " in OrderRepositoryImpl. Error: ", err)
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (o OrderRepositoryImpl) GetTotalOrders() (int, error) {
+	var totalOrders int64
+	err := o.db.Model(&models.Order{}).Count(&totalOrders).Error
+	if err != nil {
+		log.Error("Error getting total orders in OrderRepositoryImpl. Error: ", err)
+		return 0, err
+	}
+	return int(totalOrders), nil
 }
