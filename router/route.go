@@ -14,7 +14,7 @@ func Init(init *configs.Initialization) *gin.Engine {
 
 	orders := router.Group("/orders")
 	{
-		orders.GET("/", init.OrderController.GetOrders)
+		orders.GET("", init.OrderController.GetOrders)
 
 		orders.GET("/:orderId", init.OrderController.GetOrder)
 	}
