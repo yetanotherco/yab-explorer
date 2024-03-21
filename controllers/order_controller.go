@@ -72,8 +72,21 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	}
 
 	orders, err := o.service.GetOrders(page, pageSize)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
+		return
+	}
+
+	if len(orders) == 0 {
+		c.JSON(http.StatusNoContent, gin.H{"error": "No orders found"})
+		return
+	}
+
+	totalOrders, err := o.service.GetTotalOrders()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get total orders"})
 		return
 	}
 
@@ -86,12 +99,6 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	baseURL = strings.TrimSuffix(baseURL, "/")
 	nextPage := page + 1
 	prevPage := page - 1
-	totalOrders, err := o.service.GetTotalOrders()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get total orders"})
-		return
-	}
 
 	lastPage := int(math.Ceil(float64(totalOrders) / float64(pageSize)))
 
