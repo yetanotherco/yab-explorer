@@ -19,7 +19,6 @@ type OrderRepositoryImpl struct {
 }
 
 func OrderRepositoryInit(db *gorm.DB) *OrderRepositoryImpl {
-	db.AutoMigrate(&models.Order{})
 	return &OrderRepositoryImpl{db: db}
 }
 

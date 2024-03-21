@@ -11,6 +11,10 @@ import (
 
 var dbInstance *gorm.DB
 
+const (
+	DATABASE_PORT = "5432"
+)
+
 func ConnectToDB() *gorm.DB {
 	if dbInstance != nil {
 		return dbInstance
@@ -23,7 +27,7 @@ func ConnectToDB() *gorm.DB {
 	port := os.Getenv("POSTGRES_PORT")
 
 	if port == "" {
-		port = "5432"
+		port = DATABASE_PORT
 	}
 
 	databaseConnectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, name, port)
