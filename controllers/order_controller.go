@@ -39,7 +39,7 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 
 	order, err := o.service.GetOrder(orderId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Order not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 	c.JSON(http.StatusOK, order)
