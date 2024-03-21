@@ -8,7 +8,7 @@ import (
 )
 
 type OrderService interface {
-	GetOrder(orderID int) (models.Order, error)
+	GetOrder(orderId int) (models.Order, error)
 	GetOrders(page, pageSize int) ([]models.Order, error)
 	GetTotalOrders() (int, error)
 }
@@ -21,11 +21,11 @@ func OrderServiceInit(orderRepository repository.OrderRepository) *OrderServiceI
 	return &OrderServiceImpl{orderRepository: orderRepository}
 }
 
-func (o OrderServiceImpl) GetOrder(orderID int) (models.Order, error) {
-	log.Info("Called GetOrder with orderID: ", orderID, " in OrderServiceImpl.")
-	order, err := o.orderRepository.GetOrder(orderID)
+func (o OrderServiceImpl) GetOrder(orderId int) (models.Order, error) {
+	log.Info("Called GetOrder with orderId: ", orderId, " in OrderServiceImpl.")
+	order, err := o.orderRepository.GetOrder(orderId)
 	if err != nil {
-		log.Error("Error getting order with orderID: ", orderID, " in OrderServiceImpl. Error: ", err)
+		log.Error("Error getting order with orderId: ", orderId, " in OrderServiceImpl. Error: ", err)
 		return models.Order{}, err
 	}
 	return order, nil

@@ -29,15 +29,15 @@ func OrderControllerInit(orderService services.OrderService) *OrderControllerImp
 }
 
 func (o OrderControllerImpl) GetOrder(c *gin.Context) {
-	orderIDStr := c.Param("orderID")
+	orderIdStr := c.Param("orderId")
 
-	orderID, err := strconv.Atoi(orderIDStr)
+	orderId, err := strconv.Atoi(orderIdStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order Id"})
 		return
 	}
 
-	order, err := o.service.GetOrder(orderID)
+	order, err := o.service.GetOrder(orderId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Order not found"})
 		return
