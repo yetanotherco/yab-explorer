@@ -1,0 +1,51 @@
+name: "Production Build"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+    
+    - name: Install dependencies
+      run: go get -v ./...
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
+
+  deploy:
+    name: Deploy to server
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+
+    steps:
+        - name: Deploy to server
+          env:
+            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            HOST_NAME: ${{ secrets.HOST_NAME }}
+            USER_NAME: ${{ secrets.USER_NAME }}
+            APP_DIR: ${{ secrets.APP_DIR }}
+            SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          run:
+            echo "$PRIVATE_KEY" > private_key &&
+            chmod 400 private_key &&
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
+            cd ${APP_DIR} &&
+            sudo systemctl stop ${SERVICE_NAME} &&
+            git pull &&
+            sudo systemctl start ${SERVICE_NAME} "
