@@ -1,6 +1,7 @@
 package services
 
 import (
+	"math"
 	"yab-explorer/models"
 	"yab-explorer/repository"
 
@@ -9,8 +10,7 @@ import (
 
 type OrderService interface {
 	GetOrder(orderId int) (models.Order, error)
-	GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error)
-	GetTotalOrders() (int, error)
+	GetOrders(page, pageSize int, sort, direction string) (models.PaginatedSearchResult, error)
 }
 
 type OrderServiceImpl struct {
@@ -31,22 +31,21 @@ func (o OrderServiceImpl) GetOrder(orderId int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderServiceImpl) GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error) {
-	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " with sortBy: ", sortBy, " and direction: ", direction, " in OrderServiceImpl.")
-	orders, err := o.orderRepository.GetOrders(page, pageSize, sortBy, direction)
-	if err != nil {
-		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " with sortBy: ", sortBy, " and direction: ", direction, " in OrderServiceImpl. Error: ", err)
-		return []models.Order{}, err
-	}
-	return orders, nil
-}
+func (o OrderServiceImpl) GetOrders(page, pageSize int, sort, direction string) (models.PaginatedSearchResult, error) {
+	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " with sort: ", sort, " and direction: ", direction, " in OrderServiceImpl.")
 
-func (o OrderServiceImpl) GetTotalOrders() (int, error) {
-	log.Info("Called GetTotalOrders in OrderServiceImpl.")
-	totalOrders, err := o.orderRepository.GetTotalOrders()
-	if err != nil {
-		log.Error("Error getting total orders in OrderServiceImpl. Error: ", err)
-		return 0, err
+	orders, err := o.orderRepository.GetOrders(page, pageSize, sort, direction)
+	orderCount, _ := o.orderRepository.GetTotalOrders()
+	totalPages := int(math.Ceil(float64(orderCount) / float64(pageSize)))
+
+	if orderCount == 0 || page > totalPages {
+		return *models.NewPaginatedSearchResult(0, pageSize, []models.Order{}, 0), nil
 	}
-	return totalOrders, nil
+
+	if err != nil {
+		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " with sort: ", sort, " and direction: ", direction, " in OrderServiceImpl. Error: ", err)
+		return models.PaginatedSearchResult{}, err
+	}
+
+	return *models.NewPaginatedSearchResult(page, pageSize, orders, orderCount), nil
 }
