@@ -119,7 +119,7 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 func addLinkHeader(c *gin.Context, paginatedSearchResult models.PaginatedSearchResult) {
 	page := paginatedSearchResult.Page
 	pageSize := paginatedSearchResult.PageSize
-	totalOrders := paginatedSearchResult.PageCount
+	totalOrders := paginatedSearchResult.ResultsCount
 
 	scheme := "http"
 	if c.Request.TLS != nil {
