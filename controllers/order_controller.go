@@ -50,7 +50,7 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
-	sortBy := c.DefaultQuery("sortBy", "order_id")
+	sortBy := c.DefaultQuery("sort", "order_id")
 	direction := c.DefaultQuery("direction", "desc")
 
 	page, err := strconv.Atoi(pageStr)
