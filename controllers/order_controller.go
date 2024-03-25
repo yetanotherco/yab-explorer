@@ -46,6 +46,21 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+// @BasePath:
+// GetOrders godoc
+// @Summary Get orders
+// @Description Get orders
+// @Tags orders
+// @Produce json
+// @Param page query int false "Page number"
+// @Param pageSize query int false "Page size"
+// @Param sort query string false "Sort by"
+// @Param direction query string false "Sort direction"
+// @Success 200 {object} []models.Order
+// @Failure 400 {object} string
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /orders [get]
 func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
