@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
+	"yab-explorer/constant"
 	"yab-explorer/services"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +50,8 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
+	sortBy := c.DefaultQuery("sortBy", "order_id")
+	direction := c.DefaultQuery("direction", "desc")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
@@ -71,7 +75,17 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 		return
 	}
 
-	orders, err := o.service.GetOrders(page, pageSize)
+	if !slices.Contains[[]string](constant.SortArray, sortBy) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortBy parameter"})
+		return
+	}
+
+	if !slices.Contains[[]string](constant.DirectionArray, direction) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid direction parameter"})
+		return
+	}
+
+	orders, err := o.service.GetOrders(page, pageSize, sortBy, direction)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})

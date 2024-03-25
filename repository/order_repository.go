@@ -10,7 +10,7 @@ import (
 
 type OrderRepository interface {
 	GetOrder(id int) (models.Order, error)
-	GetOrders(page, pageSize int) ([]models.Order, error)
+	GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error)
 	GetTotalOrders() (int, error)
 }
 
@@ -32,11 +32,12 @@ func (o OrderRepositoryImpl) GetOrder(id int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderRepositoryImpl) GetOrders(page, pageSize int) ([]models.Order, error) {
+func (o OrderRepositoryImpl) GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error) {
 	var orders []models.Order
-	err := o.db.Limit(pageSize).Offset((page - 1) * pageSize).Order("created_at desc").Find(&orders).Error
+	orderByStr := sortBy + " " + direction
+	err := o.db.Limit(pageSize).Offset((page - 1) * pageSize).Order(orderByStr).Find(&orders).Error
 	if err != nil {
-		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " in OrderRepositoryImpl. Error: ", err)
+		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " with sortBy: ", sortBy, " and direction: ", direction, " in OrderRepositoryImpl. Error: ", err)
 		return nil, err
 	}
 	return orders, nil
