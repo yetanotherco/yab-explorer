@@ -6,7 +6,7 @@ type Order struct {
 	OrderId          int        `gorm:"column:order_id;primaryKey" json:"order_id"`
 	OriginNetwork    string     `gorm:"column:origin_network;not null;primaryKey" json:"origin_network"`
 	RecipientAddress string     `gorm:"column:recipient_address;not null;size:42" json:"recipient_address"`
-	FromAddress      string     `gorm:"column:recipient_address;not null;size:42" json:"from_address"`
+	FromAddress      string     `gorm:"column:from_address;not null;size:42" json:"from_address"`
 	Amount           string     `gorm:"column:amount;not null" json:"amount"`
 	Fee              string     `gorm:"column:fee;not null" json:"fee"`
 	Status           string     `gorm:"column:status;not null;default:PENDING" json:"status"`
