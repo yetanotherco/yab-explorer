@@ -9,7 +9,7 @@ import (
 
 type OrderService interface {
 	GetOrder(orderId int) (models.Order, error)
-	GetOrders(page, pageSize int) ([]models.Order, error)
+	GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error)
 	GetTotalOrders() (int, error)
 }
 
@@ -31,11 +31,11 @@ func (o OrderServiceImpl) GetOrder(orderId int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderServiceImpl) GetOrders(page, pageSize int) ([]models.Order, error) {
-	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " in OrderServiceImpl.")
-	orders, err := o.orderRepository.GetOrders(page, pageSize)
+func (o OrderServiceImpl) GetOrders(page, pageSize int, sortBy, direction string) ([]models.Order, error) {
+	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " with sortBy: ", sortBy, " and direction: ", direction, " in OrderServiceImpl.")
+	orders, err := o.orderRepository.GetOrders(page, pageSize, sortBy, direction)
 	if err != nil {
-		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " in OrderServiceImpl. Error: ", err)
+		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " with sortBy: ", sortBy, " and direction: ", direction, " in OrderServiceImpl. Error: ", err)
 		return []models.Order{}, err
 	}
 	return orders, nil
