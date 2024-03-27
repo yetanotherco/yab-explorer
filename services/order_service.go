@@ -2,7 +2,8 @@ package services
 
 import (
 	"math"
-	"yab-explorer/models"
+	"yab-explorer/domain/dtos"
+	"yab-explorer/domain/models"
 	"yab-explorer/repository"
 
 	log "github.com/sirupsen/logrus"
@@ -10,7 +11,7 @@ import (
 
 type OrderService interface {
 	GetOrder(orderId int) (models.Order, error)
-	GetOrders(page, pageSize int, sort, direction string) (models.PaginatedSearchResult, error)
+	GetOrders(page, pageSize int, sort, direction string) (dtos.PaginatedSearchResultDto, error)
 }
 
 type OrderServiceImpl struct {
@@ -31,7 +32,7 @@ func (o OrderServiceImpl) GetOrder(orderId int) (models.Order, error) {
 	return order, nil
 }
 
-func (o OrderServiceImpl) GetOrders(page, pageSize int, sort, direction string) (models.PaginatedSearchResult, error) {
+func (o OrderServiceImpl) GetOrders(page, pageSize int, sort, direction string) (dtos.PaginatedSearchResultDto, error) {
 	log.Info("Called GetOrders with page: ", page, " and pageSize: ", pageSize, " with sort: ", sort, " and direction: ", direction, " in OrderServiceImpl.")
 
 	orders, err := o.orderRepository.GetOrders(page, pageSize, sort, direction)
@@ -39,13 +40,19 @@ func (o OrderServiceImpl) GetOrders(page, pageSize int, sort, direction string) 
 	totalPages := int(math.Ceil(float64(orderCount) / float64(pageSize)))
 
 	if orderCount == 0 || page > totalPages {
-		return *models.NewPaginatedSearchResult(0, pageSize, []models.Order{}, 0), nil
+		return *dtos.NewPaginatedSearchResultDto(0, pageSize, []models.Order{}, 0), nil
 	}
 
 	if err != nil {
 		log.Error("Error getting orders with page: ", page, " and pageSize: ", pageSize, " with sort: ", sort, " and direction: ", direction, " in OrderServiceImpl. Error: ", err)
-		return models.PaginatedSearchResult{}, err
+		return dtos.PaginatedSearchResultDto{}, err
 	}
 
-	return *models.NewPaginatedSearchResult(page, pageSize, orders, orderCount), nil
+	var ordersDto []dtos.OrderDto
+
+	for _, order := range orders {
+		ordersDto = append(ordersDto, dtos.OrderToDto(order))
+	}
+
+	return *dtos.NewPaginatedSearchResultDto(page, pageSize, ordersDto, orderCount), nil
 }
