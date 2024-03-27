@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"yab-explorer/models"
+	"yab-explorer/domain/dtos"
+	"yab-explorer/domain/models"
 	"yab-explorer/services"
 
 	"github.com/gin-gonic/gin"
@@ -116,7 +117,7 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, paginatedSearchResult.Results)
 }
 
-func addLinkHeader(c *gin.Context, paginatedSearchResult models.PaginatedSearchResult) {
+func addLinkHeader(c *gin.Context, paginatedSearchResult dtos.PaginatedSearchResultDto) {
 	page := paginatedSearchResult.Page
 	pageSize := paginatedSearchResult.PageSize
 	totalOrders := paginatedSearchResult.ResultsCount

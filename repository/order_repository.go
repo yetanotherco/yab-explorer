@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"yab-explorer/models"
+	"yab-explorer/domain/models"
 
 	"gorm.io/gorm"
 
