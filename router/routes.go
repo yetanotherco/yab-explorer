@@ -5,6 +5,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Init(init *configs.Initialization) *gin.Engine {
@@ -20,6 +23,8 @@ func Init(init *configs.Initialization) *gin.Engine {
 
 		orders.GET("/:orderId", init.OrderController.GetOrder)
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

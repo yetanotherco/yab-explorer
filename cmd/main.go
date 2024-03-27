@@ -21,6 +21,8 @@ func main() {
 		apiPort = "8080"
 	}
 
+	configs.InitSwagger(apiPort)
+
 	init := configs.Init()
 	app := router.Init(init)
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
-	"yab-explorer/constant"
+	"yab-explorer/domain/dtos"
+	"yab-explorer/domain/models"
 	"yab-explorer/services"
 
 	"github.com/gin-gonic/gin"
@@ -47,10 +47,25 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+// @BasePath:
+// GetOrders godoc
+// @Summary Get orders
+// @Description Get orders
+// @Tags orders
+// @Produce json
+// @Param page query int false "Page number"
+// @Param pageSize query int false "Page size"
+// @Param sort query string false "Sort by"
+// @Param direction query string false "Sort direction"
+// @Success 200 {object} []models.Order
+// @Failure 400 {object} string
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /orders [get]
 func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
-	sortBy := c.DefaultQuery("sort", "order_id")
+	sort := c.DefaultQuery("sort", "order_id")
 	direction := c.DefaultQuery("direction", "desc")
 
 	page, err := strconv.Atoi(pageStr)
@@ -75,34 +90,37 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 		return
 	}
 
-	if !slices.Contains[[]string](constant.SortArray, sortBy) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortBy parameter"})
+	if !models.SortArrayContains(sort) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sort parameter"})
 		return
 	}
 
-	if !slices.Contains[[]string](constant.DirectionArray, direction) {
+	if !models.DirectionArrayContains(direction) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid direction parameter"})
 		return
 	}
 
-	orders, err := o.service.GetOrders(page, pageSize, sortBy, direction)
+	paginatedSearchResult, err := o.service.GetOrders(page, pageSize, sort, direction)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
 		return
 	}
 
-	if len(orders) == 0 {
+	if paginatedSearchResult.PageCount == 0 {
 		c.JSON(http.StatusNoContent, gin.H{"error": "No orders found"})
 		return
 	}
 
-	totalOrders, err := o.service.GetTotalOrders()
+	addLinkHeader(c, paginatedSearchResult)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get total orders"})
-		return
-	}
+	c.JSON(http.StatusOK, paginatedSearchResult.Results)
+}
+
+func addLinkHeader(c *gin.Context, paginatedSearchResult dtos.PaginatedSearchResultDto) {
+	page := paginatedSearchResult.Page
+	pageSize := paginatedSearchResult.PageSize
+	totalOrders := paginatedSearchResult.ResultsCount
 
 	scheme := "http"
 	if c.Request.TLS != nil {
@@ -132,6 +150,7 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	if linkHeader.Len() > 0 {
 		linkHeader.WriteString(", ")
 	}
+
 	linkHeader.WriteString(fmt.Sprintf("<%s?page=%d&pageSize=%d>; rel=\"first\"", baseURL, firstPage, pageSize))
 	linkHeader.WriteString(", ")
 	linkHeader.WriteString(fmt.Sprintf("<%s?page=%d&pageSize=%d>; rel=\"last\"", baseURL, lastPage, pageSize))
@@ -139,7 +158,5 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	linkHeaderStr := linkHeader.String()
 
 	c.Header("Link", linkHeaderStr)
-
-	c.JSON(http.StatusOK, orders)
 
 }
