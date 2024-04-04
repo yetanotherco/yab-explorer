@@ -15,8 +15,10 @@ deps:
 
 build: 
 	@echo "🏗️ Building..."
-	make clean 
+	make clean
 	go build -o yab-explorer ./cmd
+	swag init -g ./cmd/main.go -o ./docs
+	@echo "✅ Done"
 
 run:
 	@echo "🧑‍💻 Starting API server..."

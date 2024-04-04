@@ -39,6 +39,7 @@ The following table describes each environment variable:
 | POSTGRES_PASSWORD | The password associated with the POSTGRES_USER for authenticating with the PostgreSQL database.                                                          |
 | POSTGRES_DATABASE | The name of the PostgreSQL database.                                                                                                                     |
 | POSTGRES_PORT     | The port on which the PostgreSQL server is listening for connections. If not provided, the default value is 5432. |
+| GIN_MODE     | Controls the logging behavior of the application. Allowed values are release or debug. If not provided, default value is debug.|
 
 Run the following command to create a `.env` file based on `.env.example` with the required environment variables:
 

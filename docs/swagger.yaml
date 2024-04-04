@@ -1,0 +1,100 @@
+definitions:
+  models.HttpError:
+    properties:
+      error:
+        example: '...'
+        type: string
+    type: object
+  models.Order:
+    properties:
+      amount:
+        type: string
+      claimTxHash:
+        items:
+          type: integer
+        type: array
+      completedAt:
+        type: string
+      createdAt:
+        type: string
+      failed:
+        type: boolean
+      fee:
+        type: string
+      fromAddress:
+        type: string
+      herodotusBlock:
+        type: integer
+      herodotusSlot:
+        items:
+          type: integer
+        type: array
+      herodotusTaskId:
+        type: string
+      orderId:
+        type: integer
+      originNetwork:
+        type: string
+      recipientAddress:
+        type: string
+      setOrderTxHash:
+        items:
+          type: integer
+        type: array
+      status:
+        type: string
+      transferTxHash:
+        items:
+          type: integer
+        type: array
+      transferredAt:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /orders:
+    get:
+      description: Get orders
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Sort by
+        in: query
+        name: sort
+        type: string
+      - description: Sort direction
+        in: query
+        name: direction
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.HttpError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HttpError'
+      summary: Get orders
+      tags:
+      - orders
+swagger: "2.0"

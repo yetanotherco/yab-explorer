@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
-	"yab-explorer/constant"
+	"yab-explorer/domain/dtos"
+	"yab-explorer/domain/models"
 	"yab-explorer/services"
 
 	"github.com/gin-gonic/gin"
@@ -47,62 +47,80 @@ func (o OrderControllerImpl) GetOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+// GetOrders godoc
+//
+//	@Summary		Get orders
+//	@Description	Get orders
+//	@Tags			orders
+//	@Produce		json
+//	@Param			page		query		int		false	"Page number"
+//	@Param			pageSize	query		int		false	"Page size"
+//	@Param			sort		query		string	false	"Sort by"
+//	@Param			direction	query		string	false	"Sort direction"
+//	@Success		200			{object}	[]models.Order
+//	@Failure		400			{object}	models.HttpError
+//	@Failure		404			{object}	models.HttpError
+//	@Failure		500			{object}	models.HttpError
+//	@Router			/orders [get]
 func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
-	sortBy := c.DefaultQuery("sort", "order_id")
+	sort := c.DefaultQuery("sort", "order_id")
 	direction := c.DefaultQuery("direction", "desc")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("page must be an integer"))
 		return
 	}
 
 	pageSize, err := strconv.Atoi(pageSizeStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid pageSize number"})
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("pageSize must be an integer"))
 		return
 	}
 
 	if page < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Page must be greater than 0"})
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("page must be greater than 0"))
 		return
 	}
 
 	if pageSize < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "pageSize must be greater than 0"})
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("pageSize must be greater than 0"))
 		return
 	}
 
-	if !slices.Contains[[]string](constant.SortArray, sortBy) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortBy parameter"})
+	if !models.SortArrayContains(sort) {
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid sort parameter"))
 		return
 	}
 
-	if !slices.Contains[[]string](constant.DirectionArray, direction) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid direction parameter"})
+	if !models.DirectionArrayContains(direction) {
+		models.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid direction parameter"))
 		return
 	}
 
-	orders, err := o.service.GetOrders(page, pageSize, sortBy, direction)
+	paginatedSearchResult, err := o.service.GetOrders(page, pageSize, sort, direction)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get orders"})
+		models.NewError(c, http.StatusInternalServerError, fmt.Errorf("internal server error"))
 		return
 	}
 
-	if len(orders) == 0 {
-		c.JSON(http.StatusNoContent, gin.H{"error": "No orders found"})
+	if paginatedSearchResult.PageCount == 0 {
+		models.NewError(c, http.StatusNoContent, fmt.Errorf("no orders found"))
 		return
 	}
 
-	totalOrders, err := o.service.GetTotalOrders()
+	addLinkHeader(c, paginatedSearchResult)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get total orders"})
-		return
-	}
+	c.JSON(http.StatusOK, paginatedSearchResult.Results)
+}
+
+func addLinkHeader(c *gin.Context, paginatedSearchResult dtos.PaginatedSearchResultDto) {
+	page := paginatedSearchResult.Page
+	pageSize := paginatedSearchResult.PageSize
+	totalOrders := paginatedSearchResult.ResultsCount
 
 	scheme := "http"
 	if c.Request.TLS != nil {
@@ -132,6 +150,7 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	if linkHeader.Len() > 0 {
 		linkHeader.WriteString(", ")
 	}
+
 	linkHeader.WriteString(fmt.Sprintf("<%s?page=%d&pageSize=%d>; rel=\"first\"", baseURL, firstPage, pageSize))
 	linkHeader.WriteString(", ")
 	linkHeader.WriteString(fmt.Sprintf("<%s?page=%d&pageSize=%d>; rel=\"last\"", baseURL, lastPage, pageSize))
@@ -139,7 +158,5 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	linkHeaderStr := linkHeader.String()
 
 	c.Header("Link", linkHeaderStr)
-
-	c.JSON(http.StatusOK, orders)
 
 }
