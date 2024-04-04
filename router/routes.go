@@ -14,12 +14,8 @@ import (
 
 func Init(init *configs.Initialization) *gin.Engine {
 
-	ginMode := os.Getenv("GIN_MODE")
-	if strings.ToLower(ginMode) == "release" {
-		gin.SetMode(gin.ReleaseMode)
-	} else {
-		gin.SetMode(gin.DebugMode)
-	}
+	setGinMode(os.Getenv("GIN_MODE"))
+
 	router := gin.New()
 	router.Use(cors.Default())
 	router.Use(gin.Logger())
@@ -35,4 +31,15 @@ func Init(init *configs.Initialization) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
+}
+
+func setGinMode(ginMode string) {
+	switch strings.ToLower(ginMode) {
+	case "release":
+		gin.SetMode(gin.ReleaseMode)
+	case "debug":
+		gin.SetMode(gin.DebugMode)
+	default:
+		gin.SetMode(gin.DebugMode)
+	}
 }
