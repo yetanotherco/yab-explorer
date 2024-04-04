@@ -26,6 +26,7 @@ POSTGRES_USER=<postgres_user>
 POSTGRES_PASSWORD=<postgres_password>
 POSTGRES_DATABASE=<postgres_database>
 POSTGRES_PORT=<postgres_port>
+GIN_MODE=<release|debug>
 ```
 
 The following table describes each environment variable:
