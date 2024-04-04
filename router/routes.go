@@ -1,6 +1,8 @@
 package router
 
 import (
+	"os"
+	"strings"
 	"yab-explorer/configs"
 
 	"github.com/gin-contrib/cors"
@@ -12,6 +14,12 @@ import (
 
 func Init(init *configs.Initialization) *gin.Engine {
 
+	ginMode := os.Getenv("GIN_MODE")
+	if strings.ToLower(ginMode) == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
 	router := gin.New()
 	router.Use(cors.Default())
 	router.Use(gin.Logger())
