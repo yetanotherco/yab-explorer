@@ -53,19 +53,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.HttpError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.HttpError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.HttpError"
                         }
                     }
                 }
@@ -73,22 +73,31 @@
         }
     },
     "definitions": {
+        "models.HttpError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "..."
+                }
+            }
+        },
         "models.Order": {
             "type": "object",
             "properties": {
                 "amount": {
                     "type": "string"
                 },
-                "claim_tx_hash": {
+                "claimTxHash": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "completed_at": {
+                "completedAt": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "failed": {
@@ -97,31 +106,31 @@
                 "fee": {
                     "type": "string"
                 },
-                "from_address": {
+                "fromAddress": {
                     "type": "string"
                 },
-                "herodotus_block": {
+                "herodotusBlock": {
                     "type": "integer"
                 },
-                "herodotus_slot": {
+                "herodotusSlot": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "herodotus_task_id": {
+                "herodotusTaskId": {
                     "type": "string"
                 },
-                "order_id": {
+                "orderId": {
                     "type": "integer"
                 },
-                "origin_network": {
+                "originNetwork": {
                     "type": "string"
                 },
-                "recipient_address": {
+                "recipientAddress": {
                     "type": "string"
                 },
-                "set_order_tx_hash": {
+                "setOrderTxHash": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -130,13 +139,13 @@
                 "status": {
                     "type": "string"
                 },
-                "transfer_tx_hash": {
+                "transferTxHash": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "transferred_at": {
+                "transferredAt": {
                     "type": "string"
                 }
             }

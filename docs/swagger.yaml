@@ -1,47 +1,53 @@
 definitions:
+  models.HttpError:
+    properties:
+      error:
+        example: '...'
+        type: string
+    type: object
   models.Order:
     properties:
       amount:
         type: string
-      claim_tx_hash:
+      claimTxHash:
         items:
           type: integer
         type: array
-      completed_at:
+      completedAt:
         type: string
-      created_at:
+      createdAt:
         type: string
       failed:
         type: boolean
       fee:
         type: string
-      from_address:
+      fromAddress:
         type: string
-      herodotus_block:
+      herodotusBlock:
         type: integer
-      herodotus_slot:
+      herodotusSlot:
         items:
           type: integer
         type: array
-      herodotus_task_id:
+      herodotusTaskId:
         type: string
-      order_id:
+      orderId:
         type: integer
-      origin_network:
+      originNetwork:
         type: string
-      recipient_address:
+      recipientAddress:
         type: string
-      set_order_tx_hash:
+      setOrderTxHash:
         items:
           type: integer
         type: array
       status:
         type: string
-      transfer_tx_hash:
+      transferTxHash:
         items:
           type: integer
         type: array
-      transferred_at:
+      transferredAt:
         type: string
     type: object
 info:
@@ -79,15 +85,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/models.HttpError'
         "404":
           description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/models.HttpError'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/models.HttpError'
       summary: Get orders
       tags:
       - orders
