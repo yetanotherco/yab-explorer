@@ -35,7 +35,7 @@ sudo systemctl start caddy
 ### Configuration
 
 ```bash
-sudo ln -s /yab-explorer/infra/yab-explorer-api-sepolia.service /etc/systemd/system/yab-explorer-api-sepolia.service
+sudo ln -s /home/ubuntu/repos/yab-explorer/infra/yab-explorer-api-sepolia.service /etc/systemd/system/yab-explorer-api-sepolia.service
 sudo systemctl enable yab-explorer-api-sepolia.service
 sudo systemctl start yab-explorer-api-sepolia
 ```
