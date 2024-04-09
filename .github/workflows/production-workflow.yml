@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  Build:
+  Test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
   Deploy:
     name: Deploy to server
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [Test]
     # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
 
     steps:
@@ -41,18 +41,18 @@ jobs:
           tags: tag:ci
     
       - name: Deploy to server
-        # env:
-          # PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          # HOST_NAME: ${{ secrets.HOST_NAME }}
-          # USER_NAME: ${{ secrets.USER_NAME }}
-          # APP_DIR: ${{ secrets.APP_DIR }}
-          # SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST_NAME: ${{ vars.HOST_NAME }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          APP_DIR: ${{ vars.APP_DIR }}
+          SERVICE_NAME: ${{ vars.SERVICE_NAME }}
         run:
-          ping -c 4 100.80.2.34
-          # echo "$PRIVATE_KEY" > private_key &&
-          # chmod 400 private_key &&
-          # ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
-          # cd ${APP_DIR} &&
-          # sudo systemctl stop ${SERVICE_NAME} &&
-          # git pull &&
-          # sudo systemctl start ${SERVICE_NAME} "
+          echo "$PRIVATE_KEY" > private_key &&
+          chmod 400 private_key &&
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
+          cd ${APP_DIR} &&
+          sudo systemctl stop ${SERVICE_NAME} &&
+          git pull &&
+          make build &&
+          sudo systemctl start ${SERVICE_NAME} "
