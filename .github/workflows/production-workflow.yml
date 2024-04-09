@@ -39,6 +39,9 @@ jobs:
           oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
+
+      - name: Set PATH
+        run: echo "export PATH=\$PATH:/usr/local/go/bin:/home/ubuntu/go/bin" >> $GITHUB_ENV
     
       - name: Deploy to server
         env:
@@ -51,11 +54,9 @@ jobs:
           echo "$PRIVATE_KEY" > private_key &&
           chmod 400 private_key &&
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
-          source ~/.bashrc &&
           cd ${APP_DIR} &&
           sudo systemctl stop ${SERVICE_NAME} &&
           git pull &&
-          echo $PATH &&
           make deps &&
           make build &&
           sudo systemctl start ${SERVICE_NAME} "
