@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  Build:
+  Test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -29,22 +29,31 @@ jobs:
   Deploy:
     name: Deploy to server
     runs-on: ubuntu-latest
-    needs: [Build]
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    needs: [Test]
 
     steps:
-        - name: Deploy to server
-          env:
-            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            HOST_NAME: ${{ secrets.HOST_NAME }}
-            USER_NAME: ${{ secrets.USER_NAME }}
-            APP_DIR: ${{ secrets.APP_DIR }}
-            SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
-          run:
-            echo "$PRIVATE_KEY" > private_key &&
-            chmod 400 private_key &&
-            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
-            cd ${APP_DIR} &&
-            sudo systemctl stop ${SERVICE_NAME} &&
-            git pull &&
-            sudo systemctl start ${SERVICE_NAME} "
+      - name: Connect Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ vars.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Deploy to server
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST_NAME: ${{ vars.HOST_NAME }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          APP_DIR: ${{ vars.APP_DIR }}
+          SERVICE_NAME: ${{ vars.SERVICE_NAME }}
+        run:
+          echo "$PRIVATE_KEY" > private_key &&
+          chmod 400 private_key &&
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
+          cd ${APP_DIR} &&
+          sudo systemctl stop ${SERVICE_NAME} &&
+          git pull &&
+          /usr/local/go/bin/go install ./... &&
+          /usr/local/go/bin/go build -o yab-explorer ./cmd &&
+          /home/ubuntu/go/bin/swag init -g ./cmd/main.go -o ./docs &&
+          sudo systemctl start ${SERVICE_NAME} "
