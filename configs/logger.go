@@ -18,6 +18,7 @@ func InitLog() {
 		ShowFullLevel:   true,
 		CallerFirst:     true,
 	})
+	log.SetOutput(os.Stdout)
 }
 
 func getLoggerLevel(level string) log.Level {
