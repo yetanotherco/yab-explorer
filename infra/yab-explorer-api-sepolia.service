@@ -1,0 +1,14 @@
+[Unit]
+Description=YAB Explorer API
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/repos/yab-explorer/
+ExecStart=/home/ubuntu/repos/yab-explorer/yab-explorer
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
