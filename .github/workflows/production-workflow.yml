@@ -54,7 +54,7 @@ jobs:
           cd ${APP_DIR} &&
           sudo systemctl stop ${SERVICE_NAME} &&
           git pull &&
-          go version &&
+          echo $PATH &&
           make deps &&
           make build &&
           sudo systemctl start ${SERVICE_NAME} "
