@@ -54,8 +54,6 @@ jobs:
           cd ${APP_DIR} &&
           sudo systemctl stop ${SERVICE_NAME} &&
           git pull &&
-          go install ./... &&
-          rm -f yab-explorer &&
-          go build -o yab-explorer ./cmd &&
-          swag init -g ./cmd/main.go -o ./docs &&
+          make deps &&
+          make build &&
           sudo systemctl start ${SERVICE_NAME} "
