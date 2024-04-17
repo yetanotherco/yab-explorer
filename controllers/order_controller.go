@@ -20,6 +20,7 @@ const (
 type OrderController interface {
 	GetOrder(c *gin.Context)
 	GetOrders(c *gin.Context)
+	GetOrdersCount(c *gin.Context)
 }
 
 type OrderControllerImpl struct {
@@ -115,6 +116,15 @@ func (o OrderControllerImpl) GetOrders(c *gin.Context) {
 	addLinkHeader(c, paginatedSearchResult)
 
 	c.JSON(http.StatusOK, paginatedSearchResult.Results)
+}
+
+func (o OrderControllerImpl) GetOrdersCount(c *gin.Context) {
+	count, err := o.service.GetOrdersCount()
+	if err != nil {
+		models.NewError(c, http.StatusInternalServerError, fmt.Errorf("internal server error"))
+		return
+	}
+	c.JSON(http.StatusOK, count)
 }
 
 func addLinkHeader(c *gin.Context, paginatedSearchResult dtos.PaginatedSearchResultDto) {
