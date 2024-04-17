@@ -26,6 +26,8 @@ func Init(init *configs.Initialization) *gin.Engine {
 		orders.GET("", init.OrderController.GetOrders)
 
 		orders.GET("/:orderId", init.OrderController.GetOrder)
+
+		orders.GET("/count", init.OrderController.GetOrdersCount)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

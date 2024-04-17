@@ -12,6 +12,7 @@ import (
 type OrderService interface {
 	GetOrder(orderId int) (models.Order, error)
 	GetOrders(page, pageSize int, sort, direction string) (dtos.PaginatedSearchResultDto, error)
+	GetOrdersCount() (int, error)
 }
 
 type OrderServiceImpl struct {
@@ -55,4 +56,14 @@ func (o OrderServiceImpl) GetOrders(page, pageSize int, sort, direction string) 
 	}
 
 	return *dtos.NewPaginatedSearchResultDto(page, pageSize, ordersDto, orderCount), nil
+}
+
+func (o OrderServiceImpl) GetOrdersCount() (int, error) {
+	log.Info("Called GetOrdersCount in OrderServiceImpl.")
+	orderCount, err := o.orderRepository.GetTotalOrders()
+	if err != nil {
+		log.Error("Error getting orders count in OrderServiceImpl. Error: ", err)
+		return 0, err
+	}
+	return orderCount, nil
 }
